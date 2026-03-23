@@ -1,0 +1,69 @@
+import { Pet } from "@/lib/api";
+import { Dog, Cat, MapPin, Scale, Calendar, Trash2, Pencil } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+
+interface PetCardProps {
+  pet: Pet;
+  onEdit: (pet: Pet) => void;
+  onDelete: (pet: Pet) => void;
+}
+
+export function PetCard({ pet, onEdit, onDelete }: PetCardProps) {
+  const Icon = pet.type === "CAO" ? Dog : Cat;
+  const typeLabel = pet.type === "CAO" ? "Cão" : "Gato";
+  const genderLabel = pet.gender === "M" ? "Macho" : "Fêmea";
+
+  return (
+    <div className="group relative rounded-lg border bg-card p-5 shadow-card hover:shadow-elevated transition-all duration-200 animate-fade-in">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="flex h-11 w-11 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <Icon className="h-5 w-5" />
+          </div>
+          <div>
+            <h3 className="font-display text-lg font-semibold leading-tight">{pet.name}</h3>
+            <div className="flex items-center gap-2 mt-1">
+              <Badge variant="secondary" className="text-xs">{typeLabel}</Badge>
+              <Badge variant="outline" className="text-xs">{genderLabel}</Badge>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onEdit(pet)}>
+            <Pencil className="h-4 w-4" />
+          </Button>
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" onClick={() => onDelete(pet)}>
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+
+      <div className="mt-4 grid grid-cols-2 gap-2 text-sm text-muted-foreground">
+        <div className="flex items-center gap-1.5">
+          <Calendar className="h-3.5 w-3.5" />
+          <span>{pet.age || "N/I"}</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <Scale className="h-3.5 w-3.5" />
+          <span>{pet.weight || "N/I"}</span>
+        </div>
+        <div className="flex items-center gap-1.5 col-span-2">
+          <MapPin className="h-3.5 w-3.5 shrink-0" />
+          <span className="truncate">
+            {pet.address
+              ? `${pet.address.street}, ${pet.address.number} - ${pet.address.city}`
+              : "Não informado"}
+          </span>
+        </div>
+      </div>
+
+      {pet.race && pet.race !== "NÃO INFORMADO" && (
+        <p className="mt-3 text-xs text-muted-foreground">
+          Raça: <span className="font-medium text-foreground">{pet.race}</span>
+        </p>
+      )}
+    </div>
+  );
+}
