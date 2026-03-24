@@ -52,6 +52,7 @@ export function PetDialog({ open, onOpenChange, pet, onSubmit, isPending }: PetD
           onSubmit={onSubmit}
           isPending={isPending}
           submitLabel={isEdit ? "Atualizar" : "Cadastrar"}
+          isEdit={isEdit}
         />
       </DialogContent>
     </Dialog>
