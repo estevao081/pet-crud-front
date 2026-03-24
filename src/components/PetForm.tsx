@@ -17,9 +17,10 @@ interface PetFormProps {
   onSubmit: (data: PetFormData) => void;
   isPending?: boolean;
   submitLabel?: string;
+  isEdit?: boolean;
 }
 
-export function PetForm({ initialData, onSubmit, isPending, submitLabel = "Salvar" }: PetFormProps) {
+export function PetForm({ initialData, onSubmit, isPending, submitLabel = "Salvar", isEdit = false }: PetFormProps) {
   const [form, setForm] = useState<PetFormData>({
     name: initialData?.name || "",
     type: initialData?.type || "",
@@ -55,35 +56,39 @@ export function PetForm({ initialData, onSubmit, isPending, submitLabel = "Salva
           />
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="type">Tipo</Label>
-          <Select value={form.type} onValueChange={(v) => handleChange("type", v)}>
-            <SelectTrigger>
-              <SelectValue placeholder="Selecione o tipo" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="CÃO">
-                <span className="flex items-center gap-2"><Dog className="w-4 h-4" /> Cão</span>
-              </SelectItem>
-              <SelectItem value="GATO">
-                <span className="flex items-center gap-2"><Cat className="w-4 h-4" /> Gato</span>
-              </SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        {!isEdit && (
+          <div className="space-y-2">
+            <Label htmlFor="type">Tipo</Label>
+            <Select value={form.type} onValueChange={(v) => handleChange("type", v)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione o tipo" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="CÃO">
+                  <span className="flex items-center gap-2"><Dog className="w-4 h-4" /> Cão</span>
+                </SelectItem>
+                <SelectItem value="GATO">
+                  <span className="flex items-center gap-2"><Cat className="w-4 h-4" /> Gato</span>
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        )}
 
-        <div className="space-y-2">
-          <Label htmlFor="gender">Sexo</Label>
-          <Select value={form.gender} onValueChange={(v) => handleChange("gender", v)}>
-            <SelectTrigger>
-              <SelectValue placeholder="Selecione o sexo" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="M">Macho</SelectItem>
-              <SelectItem value="F">Fêmea</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        {!isEdit && (
+          <div className="space-y-2">
+            <Label htmlFor="gender">Sexo</Label>
+            <Select value={form.gender} onValueChange={(v) => handleChange("gender", v)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione o sexo" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="M">Macho</SelectItem>
+                <SelectItem value="F">Fêmea</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        )}
 
         <div className="space-y-2">
           <Label htmlFor="race">Raça</Label>
