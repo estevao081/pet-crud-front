@@ -36,10 +36,17 @@ export interface ApiResponse<T> {
   timestamp: string;
 }
 
-async function request<T>(path: string, options?: RequestInit): Promise<ApiResponse<T>> {
+async function request<T>(path: string, options: RequestInit = {}): Promise<ApiResponse<T>> {
+  const headers = new Headers(options.headers);
+  const hasBody = options.body !== undefined && options.body !== null;
+
+  if (hasBody && !headers.has("Content-Type")) {
+    headers.set("Content-Type", "application/json");
+  }
+
   const res = await fetch(`${API_BASE}${path}`, {
-    headers: { "Content-Type": "application/json" },
     ...options,
+    headers,
   });
   const json = await res.json();
   if (!res.ok) throw new Error(json.message || "Erro na requisição");
