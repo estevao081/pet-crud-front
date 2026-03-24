@@ -63,6 +63,12 @@ export const petApi = {
   delete: (id: string) =>
     request<null>(`/pets/${id}`, { method: "DELETE" }),
 
-  search: (filter: Partial<PetFormData>) =>
-    request<Pet[]>("/pets/search", { method: "POST", body: JSON.stringify(filter) }),
+  search: (filter: Partial<PetFormData>) => {
+    const { street, number, city, ...rest } = filter;
+    const payload: Record<string, unknown> = { ...rest };
+    if (street || number || city) {
+      payload.address = { street: street || "", number: number || "", city: city || "" };
+    }
+    return request<Pet[]>("/pets/search", { method: "POST", body: JSON.stringify(payload) });
+  },
 };
