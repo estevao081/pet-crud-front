@@ -7,7 +7,7 @@ export function usePets() {
     queryKey: ["pets"],
     queryFn: async () => {
       const res = await petApi.findAll();
-      return res.data;
+      return [...res.data].reverse();
     },
   });
 }
