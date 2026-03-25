@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_URL || "https://pet-crud-api.onrender.com";
+const API_BASE = import.meta.env.VITE_API_URL;
 
 export interface PetAddress {
   city: string;
