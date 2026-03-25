@@ -1,9 +1,8 @@
 const API_BASE = import.meta.env.VITE_API_URL || "https://pet-crud-api.onrender.com";
 
 export interface PetAddress {
-  street: string;
-  number: string;
   city: string;
+  state: string;
 }
 
 export interface Pet {
@@ -21,9 +20,8 @@ export interface PetFormData {
   name: string;
   type: string;
   gender: string;
-  street: string;
-  number: string;
   city: string;
+  state: string;
   age: string;
   weight: string;
   race: string;
@@ -54,8 +52,8 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<ApiR
 }
 
 function toPayload(data: PetFormData) {
-  const { street, number, city, ...rest } = data;
-  return { ...rest, address: { street, number, city } };
+  const { city, state, ...rest } = data;
+  return { ...rest, address: { city, state } };
 }
 
 export const petApi = {
@@ -71,10 +69,10 @@ export const petApi = {
     request<null>(`/pets/${id}`, { method: "DELETE" }),
 
   search: (filter: Partial<PetFormData>) => {
-    const { street, number, city, ...rest } = filter;
+    const { city, state, ...rest } = filter;
     const payload: Record<string, unknown> = { ...rest };
-    if (street || number || city) {
-      payload.address = { street: street || "", number: number || "", city: city || "" };
+    if (city || state) {
+      payload.address = { city: city || "", state: state || "" };
     }
     return request<Pet[]>("/pets/search", { method: "POST", body: JSON.stringify(payload) });
   },

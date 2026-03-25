@@ -12,6 +12,11 @@ import {
 } from "@/components/ui/select";
 import { Dog, Cat } from "lucide-react";
 
+const BRAZILIAN_STATES = [
+  "AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG",
+  "PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO",
+];
+
 interface PetFormProps {
   initialData?: Partial<PetFormData>;
   onSubmit: (data: PetFormData) => void;
@@ -25,9 +30,8 @@ export function PetForm({ initialData, onSubmit, isPending, submitLabel = "Salva
     name: initialData?.name || "",
     type: initialData?.type || "",
     gender: initialData?.gender || "",
-    street: initialData?.street || "",
-    number: initialData?.number || "",
     city: initialData?.city || "",
+    state: initialData?.state || "",
     age: initialData?.age || "",
     weight: initialData?.weight || "",
     race: initialData?.race || "",
@@ -104,6 +108,8 @@ export function PetForm({ initialData, onSubmit, isPending, submitLabel = "Salva
           <Label htmlFor="age">Idade (anos)</Label>
           <Input
             id="age"
+            type="number"
+            min="0"
             placeholder="Ex: 3"
             value={form.age}
             onChange={(e) => handleChange("age", e.target.value)}
@@ -114,6 +120,9 @@ export function PetForm({ initialData, onSubmit, isPending, submitLabel = "Salva
           <Label htmlFor="weight">Peso (kg)</Label>
           <Input
             id="weight"
+            type="number"
+            min="0"
+            step="0.1"
             placeholder="Ex: 5.5"
             value={form.weight}
             onChange={(e) => handleChange("weight", e.target.value)}
@@ -123,25 +132,7 @@ export function PetForm({ initialData, onSubmit, isPending, submitLabel = "Salva
 
       <div className="space-y-3">
         <h3 className="font-display text-sm font-medium text-muted-foreground">Endereço onde foi encontrado</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="street">Rua</Label>
-            <Input
-              id="street"
-              placeholder="Ex: Rua das Flores"
-              value={form.street}
-              onChange={(e) => handleChange("street", e.target.value)}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="number">Número</Label>
-            <Input
-              id="number"
-              placeholder="Ex: 123"
-              value={form.number}
-              onChange={(e) => handleChange("number", e.target.value)}
-            />
-          </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="city">Cidade</Label>
             <Input
@@ -150,6 +141,19 @@ export function PetForm({ initialData, onSubmit, isPending, submitLabel = "Salva
               value={form.city}
               onChange={(e) => handleChange("city", e.target.value)}
             />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="state">Estado</Label>
+            <Select value={form.state} onValueChange={(v) => handleChange("state", v)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione o estado" />
+              </SelectTrigger>
+              <SelectContent>
+                {BRAZILIAN_STATES.map((uf) => (
+                  <SelectItem key={uf} value={uf}>{uf}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </div>

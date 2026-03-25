@@ -43,17 +43,17 @@ export function PetCard({ pet, onEdit, onDelete }: PetCardProps) {
       <div className="mt-4 grid grid-cols-2 gap-2 text-sm text-muted-foreground">
         <div className="flex items-center gap-1.5">
           <Calendar className="h-3.5 w-3.5" />
-          <span>{pet.age || "não informado"}</span>
+          <span>{pet.age && !isNaN(Number(pet.age)) ? `${pet.age} anos` : "não informado"}</span>
         </div>
         <div className="flex items-center gap-1.5">
           <Scale className="h-3.5 w-3.5" />
-          <span>{pet.weight || "não informado"}</span>
+          <span>{pet.weight && !isNaN(Number(pet.weight)) ? `${pet.weight} kg` : "não informado"}</span>
         </div>
         <div className="flex items-center gap-1.5 col-span-2">
           <MapPin className="h-3.5 w-3.5 shrink-0" />
           <span className="truncate">
-            {pet.address
-              ? `${pet.address.street}, ${pet.address.number} - ${pet.address.city}`
+            {pet.address?.city || pet.address?.state
+              ? `${pet.address.city}${pet.address.state ? ` - ${pet.address.state}` : ""}`
               : "não informado"}
           </span>
         </div>
