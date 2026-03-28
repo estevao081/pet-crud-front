@@ -48,8 +48,7 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<ApiR
 }
 
 function toPayload(data: PetFormData) {
-  const { city, state, ...rest } = data;
-  return { ...rest, address: { city, state } };
+  return { ...data };
 }
 
 export const petApi = {
