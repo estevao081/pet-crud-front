@@ -53,8 +53,8 @@ export function SearchBar({ onSearch, onClear, isPending }: SearchBarProps) {
 
   return (
     <div className="space-y-3">
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div className="relative flex-1">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div className="relative sm:col-span-2">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Buscar por nome..."
@@ -68,14 +68,13 @@ export function SearchBar({ onSearch, onClear, isPending }: SearchBarProps) {
           placeholder="Raça..."
           value={race}
           onChange={(e) => setRace(e.target.value)}
-          className="w-full sm:w-[160px]"
           onKeyDown={(e) => e.key === "Enter" && handleSearch()}
         />
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-6 gap-3">
         <Select value={type} onValueChange={setType}>
-          <SelectTrigger className="w-full sm:w-[140px]">
+          <SelectTrigger>
             <SelectValue placeholder="Tipo" />
           </SelectTrigger>
           <SelectContent>
@@ -86,7 +85,7 @@ export function SearchBar({ onSearch, onClear, isPending }: SearchBarProps) {
         </Select>
 
         <Select value={gender} onValueChange={setGender}>
-          <SelectTrigger className="w-full sm:w-[140px]">
+          <SelectTrigger>
             <SelectValue placeholder="Sexo" />
           </SelectTrigger>
           <SelectContent>
@@ -100,12 +99,11 @@ export function SearchBar({ onSearch, onClear, isPending }: SearchBarProps) {
           placeholder="Cidade..."
           value={city}
           onChange={(e) => setCity(e.target.value)}
-          className="w-full sm:w-[160px]"
           onKeyDown={(e) => e.key === "Enter" && handleSearch()}
         />
 
         <Select value={state} onValueChange={setState}>
-          <SelectTrigger className="w-full sm:w-[140px]">
+          <SelectTrigger>
             <SelectValue placeholder="Estado" />
           </SelectTrigger>
           <SelectContent>
@@ -116,14 +114,12 @@ export function SearchBar({ onSearch, onClear, isPending }: SearchBarProps) {
           </SelectContent>
         </Select>
 
-        <div className="flex gap-2">
-          <Button onClick={handleSearch} disabled={isPending}>
-            <Search className="h-4 w-4 mr-1" /> Buscar
-          </Button>
-          <Button variant="outline" onClick={handleClear}>
-            <X className="h-4 w-4 mr-1" /> Limpar
-          </Button>
-        </div>
+        <Button onClick={handleSearch} disabled={isPending} className="w-full">
+          <Search className="h-4 w-4 mr-1.5" /> Buscar
+        </Button>
+        <Button variant="outline" onClick={handleClear} className="w-full">
+          <X className="h-4 w-4 mr-1.5" /> Limpar
+        </Button>
       </div>
     </div>
   );
