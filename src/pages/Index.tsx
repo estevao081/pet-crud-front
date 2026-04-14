@@ -139,6 +139,7 @@ export default function Index() {
                 onEdit={handleEdit}
                 onDelete={setDeletingPet}
                 currentUserName={user?.name}
+                isAdmin={user?.role === "ROLE_ADMIN"}
               />
             ))}
           </div>
