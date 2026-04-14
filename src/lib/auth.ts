@@ -3,16 +3,6 @@ const API_BASE = import.meta.env.VITE_API_URL;
 export interface AuthUser {
   name: string;
   token: string;
-  role: string;
-}
-
-function parseJwtRole(token: string): string {
-  try {
-    const payload = JSON.parse(atob(token.split(".")[1]));
-    return payload.role || "ROLE_USER";
-  } catch {
-    return "ROLE_USER";
-  }
 }
 
 export interface RegisterData {
@@ -46,7 +36,7 @@ export async function registerUser(data: RegisterData): Promise<AuthUser> {
   });
   const json: ApiResponse<LoginResponseDTO> = await res.json();
   if (!res.ok || !json.success) throw new Error(json.message || "Erro ao cadastrar");
-  return { name: json.data.name, token: json.data.token, role: parseJwtRole(json.data.token) };
+  return { name: json.data.name, token: json.data.token };
 }
 
 export async function loginUser(data: LoginData): Promise<AuthUser> {
@@ -57,7 +47,7 @@ export async function loginUser(data: LoginData): Promise<AuthUser> {
   });
   const json: ApiResponse<LoginResponseDTO> = await res.json();
   if (!res.ok || !json.success) throw new Error(json.message || "Credenciais inválidas");
-  return { name: json.data.name, token: json.data.token, role: parseJwtRole(json.data.token) };
+  return { name: json.data.name, token: json.data.token };
 }
 
 export function getStoredAuth(): AuthUser | null {

@@ -8,16 +8,14 @@ interface PetCardProps {
   onEdit: (pet: Pet) => void;
   onDelete: (pet: Pet) => void;
   currentUserName?: string;
-  isAdmin?: boolean;
 }
 
-export function PetCard({ pet, onEdit, onDelete, currentUserName, isAdmin }: PetCardProps) {
+export function PetCard({ pet, onEdit, onDelete, currentUserName }: PetCardProps) {
   const Icon = pet.type === "CAO" ? Dog : Cat;
   const typeLabel = pet.type === "CAO" ? "Cão" : "Gato";
   const genderLabel = pet.gender === "M" ? "Macho" : "Fêmea";
 
   const isOwner = currentUserName && pet.owner?.name === currentUserName;
-  const canManage = isOwner || isAdmin;
 
   return (
     <div className="group relative rounded-lg border bg-card p-5 shadow-card hover:shadow-elevated transition-all duration-200 animate-fade-in">
@@ -35,7 +33,7 @@ export function PetCard({ pet, onEdit, onDelete, currentUserName, isAdmin }: Pet
           </div>
         </div>
 
-        {canManage && (
+        {isOwner && (
           <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
             <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onEdit(pet)}>
               <Pencil className="h-4 w-4" />
