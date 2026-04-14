@@ -73,7 +73,7 @@ export function PetCard({ pet, onEdit, onDelete, currentUserName }: PetCardProps
       {pet.owner && (
         <div className="mt-3 flex items-center gap-1.5 text-xs text-muted-foreground border-t pt-3">
           <User className="h-3.5 w-3.5" />
-          <span>Cadastrado por <strong className="text-foreground">{pet.owner.name}</strong></span>
+          <span>Cadastrado por <strong className="text-foreground">{pet.owner.name}</strong> · {pet.owner.number}</span>
         </div>
       )}
     </div>
