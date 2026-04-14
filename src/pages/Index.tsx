@@ -1,16 +1,20 @@
 import { useState } from "react";
 import { Pet, PetFormData } from "@/lib/api";
 import { usePets, useSearchPets, useSavePet, useUpdatePet, useDeletePet } from "@/hooks/use-pets";
+import { useAuth } from "@/contexts/AuthContext";
 import { PetCard } from "@/components/PetCard";
 import { SearchBar } from "@/components/SearchBar";
 import { PetDialog } from "@/components/PetDialog";
 import { DeleteConfirmDialog } from "@/components/DeleteConfirmDialog";
 import { Button } from "@/components/ui/button";
-import { PawPrint, Plus, Loader2 } from "lucide-react";
+import { PawPrint, Plus, Loader2, LogIn, LogOut, UserPlus } from "lucide-react";
+import { Link } from "react-router-dom";
+import { toast } from "sonner";
 
 export default function Index() {
   const { data: pets, isLoading, refetch } = usePets();
   const searchMutation = useSearchPets();
+  const { user, isAuthenticated, logout } = useAuth();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingPet, setEditingPet] = useState<Pet | null>(null);
   const [deletingPet, setDeletingPet] = useState<Pet | null>(null);
@@ -28,6 +32,10 @@ export default function Index() {
   };
 
   const handleNewPet = () => {
+    if (!isAuthenticated) {
+      toast.error("Faça login para cadastrar um pet.");
+      return;
+    }
     setEditingPet(null);
     setDialogOpen(true);
   };
@@ -50,7 +58,6 @@ export default function Index() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
       <header className="border-b bg-card/80 backdrop-blur-sm sticky top-0 z-10">
         <div className="container flex items-center justify-between h-16">
           <div className="flex items-center gap-2.5">
@@ -61,15 +68,39 @@ export default function Index() {
               AdotaPet
             </h1>
           </div>
-          <Button onClick={handleNewPet}>
-            <Plus className="h-4 w-4 mr-1.5" /> Novo Pet
-          </Button>
+
+          <div className="flex items-center gap-2">
+            {isAuthenticated ? (
+              <>
+                <span className="text-sm text-muted-foreground hidden sm:inline">
+                  Olá, <strong className="text-foreground">{user?.name}</strong>
+                </span>
+                <Button onClick={handleNewPet}>
+                  <Plus className="h-4 w-4 mr-1.5" /> Novo Pet
+                </Button>
+                <Button variant="outline" size="icon" onClick={logout} title="Sair">
+                  <LogOut className="h-4 w-4" />
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button variant="outline" asChild>
+                  <Link to="/login">
+                    <LogIn className="h-4 w-4 mr-1.5" /> Entrar
+                  </Link>
+                </Button>
+                <Button asChild>
+                  <Link to="/register">
+                    <UserPlus className="h-4 w-4 mr-1.5" /> Cadastrar
+                  </Link>
+                </Button>
+              </>
+            )}
+          </div>
         </div>
       </header>
 
-      {/* Main content */}
       <main className="container py-8 space-y-6">
-        {/* Hero */}
         <div className="text-center space-y-2 pb-2">
           <h2 className="font-display text-3xl sm:text-4xl font-bold">
             Sistema de Adoção de Pets 🐾
@@ -79,14 +110,12 @@ export default function Index() {
           </p>
         </div>
 
-        {/* Search */}
         <SearchBar
           onSearch={(filter) => searchMutation.mutate(filter)}
           onClear={() => refetch()}
           isPending={searchMutation.isPending}
         />
 
-        {/* Pet grid */}
         {isLoading ? (
           <div className="flex items-center justify-center py-20">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -95,9 +124,11 @@ export default function Index() {
           <div className="text-center py-20 space-y-3">
             <PawPrint className="h-12 w-12 mx-auto text-muted-foreground/40" />
             <p className="text-muted-foreground">Nenhum pet cadastrado ainda.</p>
-            <Button variant="outline" onClick={handleNewPet}>
-              <Plus className="h-4 w-4 mr-1.5" /> Cadastrar primeiro pet
-            </Button>
+            {isAuthenticated && (
+              <Button variant="outline" onClick={handleNewPet}>
+                <Plus className="h-4 w-4 mr-1.5" /> Cadastrar primeiro pet
+              </Button>
+            )}
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -107,13 +138,13 @@ export default function Index() {
                 pet={pet}
                 onEdit={handleEdit}
                 onDelete={setDeletingPet}
+                currentUserName={user?.name}
               />
             ))}
           </div>
         )}
       </main>
 
-      {/* Dialogs */}
       <PetDialog
         open={dialogOpen}
         onOpenChange={(open) => {

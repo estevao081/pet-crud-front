@@ -1,5 +1,5 @@
 import { Pet } from "@/lib/api";
-import { Dog, Cat, MapPin, Scale, Calendar, Trash2, Pencil } from "lucide-react";
+import { Dog, Cat, MapPin, Scale, Calendar, Trash2, Pencil, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
@@ -7,12 +7,15 @@ interface PetCardProps {
   pet: Pet;
   onEdit: (pet: Pet) => void;
   onDelete: (pet: Pet) => void;
+  currentUserName?: string;
 }
 
-export function PetCard({ pet, onEdit, onDelete }: PetCardProps) {
+export function PetCard({ pet, onEdit, onDelete, currentUserName }: PetCardProps) {
   const Icon = pet.type === "CAO" ? Dog : Cat;
   const typeLabel = pet.type === "CAO" ? "Cão" : "Gato";
   const genderLabel = pet.gender === "M" ? "Macho" : "Fêmea";
+
+  const isOwner = currentUserName && pet.owner?.name === currentUserName;
 
   return (
     <div className="group relative rounded-lg border bg-card p-5 shadow-card hover:shadow-elevated transition-all duration-200 animate-fade-in">
@@ -30,14 +33,16 @@ export function PetCard({ pet, onEdit, onDelete }: PetCardProps) {
           </div>
         </div>
 
-        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onEdit(pet)}>
-            <Pencil className="h-4 w-4" />
-          </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" onClick={() => onDelete(pet)}>
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        </div>
+        {isOwner && (
+          <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onEdit(pet)}>
+              <Pencil className="h-4 w-4" />
+            </Button>
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" onClick={() => onDelete(pet)}>
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
       </div>
 
       <div className="mt-4 grid grid-cols-2 gap-2 text-sm text-muted-foreground">
@@ -63,6 +68,13 @@ export function PetCard({ pet, onEdit, onDelete }: PetCardProps) {
         <p className="mt-3 text-xs text-muted-foreground">
           Raça: <span className="font-medium text-foreground">{pet.race}</span>
         </p>
+      )}
+
+      {pet.owner && (
+        <div className="mt-3 flex items-center gap-1.5 text-xs text-muted-foreground border-t pt-3">
+          <User className="h-3.5 w-3.5" />
+          <span>Cadastrado por <strong className="text-foreground">{pet.owner.name}</strong></span>
+        </div>
       )}
     </div>
   );

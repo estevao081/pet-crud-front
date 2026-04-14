@@ -1,4 +1,11 @@
+import { getAuthHeaders } from "./auth";
+
 const API_BASE = import.meta.env.VITE_API_URL;
+
+export interface PetOwner {
+  name: string;
+  number: number;
+}
 
 export interface Pet {
   id: string;
@@ -10,6 +17,7 @@ export interface Pet {
   age: string;
   weight: string;
   race: string;
+  owner?: PetOwner;
 }
 
 export interface PetFormData {
@@ -31,7 +39,8 @@ export interface ApiResponse<T> {
 }
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<ApiResponse<T>> {
-  const headers = new Headers(options.headers);
+  const authHeaders = getAuthHeaders();
+  const headers = new Headers({ ...authHeaders, ...Object.fromEntries(new Headers(options.headers).entries()) });
   const hasBody = options.body !== undefined && options.body !== null;
 
   if (hasBody && !headers.has("Content-Type")) {
