@@ -1,13 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { petApi, type Pet, type PetFormData } from "@/lib/api";
+import { petApi, type Pet, type PetFormData, type PageData } from "@/lib/api";
 import { toast } from "sonner";
 
-export function usePets() {
+export function usePets(page: number) {
   return useQuery({
-    queryKey: ["pets"],
+    queryKey: ["pets", page],
     queryFn: async () => {
-      const res = await petApi.findAll();
-      return [...res.data].reverse();
+      const res = await petApi.findAll(page);
+      return res.data;
     },
   });
 }
@@ -15,9 +15,10 @@ export function usePets() {
 export function useSearchPets() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (filter: Partial<PetFormData>) => petApi.search(filter),
+    mutationFn: ({ filter, page }: { filter: Partial<PetFormData>; page: number }) =>
+      petApi.search(filter, page),
     onSuccess: (res) => {
-      queryClient.setQueryData(["pets"], res.data);
+      queryClient.setQueryData(["pets-search"], res.data);
     },
     onError: (err: Error) => toast.error(err.message),
   });

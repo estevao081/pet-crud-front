@@ -31,6 +31,16 @@ export interface PetFormData {
   race: string;
 }
 
+export interface PageData<T> {
+  content: T[];
+  totalPages: number;
+  totalElements: number;
+  number: number;
+  size: number;
+  first: boolean;
+  last: boolean;
+}
+
 export interface ApiResponse<T> {
   success: boolean;
   data: T;
@@ -61,7 +71,8 @@ function toPayload(data: PetFormData) {
 }
 
 export const petApi = {
-  findAll: () => request<Pet[]>("/pets"),
+  findAll: (page = 0, items = 9) =>
+    request<PageData<Pet>>(`/pets?page=${page}&items=${items}`),
 
   save: (data: PetFormData) =>
     request<null>("/pets", { method: "POST", body: JSON.stringify(toPayload(data)) }),
@@ -72,6 +83,9 @@ export const petApi = {
   delete: (id: string) =>
     request<null>(`/pets/${id}`, { method: "DELETE" }),
 
-  search: (filter: Partial<PetFormData>) =>
-    request<Pet[]>("/pets/search", { method: "POST", body: JSON.stringify(filter) }),
+  search: (filter: Partial<PetFormData>, page = 0, items = 9) =>
+    request<PageData<Pet>>(`/pets/search?page=${page}&items=${items}`, {
+      method: "POST",
+      body: JSON.stringify(filter),
+    }),
 };
