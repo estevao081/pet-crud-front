@@ -31,6 +31,16 @@ export interface PetFormData {
   race: string;
 }
 
+export interface PageData<T> {
+  content: T[];
+  totalPages: number;
+  totalElements: number;
+  number: number;
+  size: number;
+  first: boolean;
+  last: boolean;
+}
+
 export interface ApiResponse<T> {
   success: boolean;
   data: T;
