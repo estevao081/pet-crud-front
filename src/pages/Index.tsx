@@ -7,12 +7,16 @@ import { SearchBar } from "@/components/SearchBar";
 import { PetDialog } from "@/components/PetDialog";
 import { DeleteConfirmDialog } from "@/components/DeleteConfirmDialog";
 import { Button } from "@/components/ui/button";
-import { PawPrint, Plus, Loader2, LogIn, LogOut, UserPlus } from "lucide-react";
+import { PawPrint, Plus, Loader2, LogIn, LogOut, UserPlus, ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 
 export default function Index() {
-  const { data: pets, isLoading, refetch } = usePets();
+  const [page, setPage] = useState(0);
+  const [searchFilter, setSearchFilter] = useState<Partial<PetFormData> | null>(null);
+  const [searchPage, setSearchPage] = useState(0);
+
+  const { data: petsPage, isLoading, refetch } = usePets(page);
   const searchMutation = useSearchPets();
   const { user, isAuthenticated, logout } = useAuth();
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -25,6 +29,13 @@ export default function Index() {
     setEditingPet(null);
   });
   const deleteMutation = useDeletePet();
+
+  const isSearching = !!searchFilter;
+  const searchData = searchMutation.data;
+  const activePage = isSearching ? searchData : petsPage;
+  const pets = activePage?.content ?? [];
+  const totalPages = activePage?.totalPages ?? 0;
+  const currentPage = isSearching ? (searchData?.number ?? 0) : page;
 
   const handleEdit = (pet: Pet) => {
     setEditingPet(pet);
@@ -53,6 +64,27 @@ export default function Index() {
       deleteMutation.mutate(deletingPet.id, {
         onSuccess: () => setDeletingPet(null),
       });
+    }
+  };
+
+  const handleSearch = (filter: Partial<PetFormData>) => {
+    setSearchFilter(filter);
+    setSearchPage(0);
+    searchMutation.mutate({ filter, page: 0 });
+  };
+
+  const handleClearSearch = () => {
+    setSearchFilter(null);
+    setSearchPage(0);
+    refetch();
+  };
+
+  const handlePageChange = (newPage: number) => {
+    if (isSearching && searchFilter) {
+      setSearchPage(newPage);
+      searchMutation.mutate({ filter: searchFilter, page: newPage });
+    } else {
+      setPage(newPage);
     }
   };
 
@@ -111,8 +143,8 @@ export default function Index() {
         </div>
 
         <SearchBar
-          onSearch={(filter) => searchMutation.mutate(filter)}
-          onClear={() => refetch()}
+          onSearch={handleSearch}
+          onClear={handleClearSearch}
           isPending={searchMutation.isPending}
         />
 
@@ -120,7 +152,7 @@ export default function Index() {
           <div className="flex items-center justify-center py-20">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
-        ) : !pets || pets.length === 0 ? (
+        ) : pets.length === 0 ? (
           <div className="text-center py-20 space-y-3">
             <PawPrint className="h-12 w-12 mx-auto text-muted-foreground/40" />
             <p className="text-muted-foreground">Nenhum pet cadastrado ainda.</p>
@@ -131,18 +163,44 @@ export default function Index() {
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {pets.map((pet) => (
-              <PetCard
-                key={pet.id}
-                pet={pet}
-                onEdit={handleEdit}
-                onDelete={setDeletingPet}
-                currentUserName={user?.name}
-                isAdmin={user?.role === "ROLE_ADMIN"}
-              />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {pets.map((pet) => (
+                <PetCard
+                  key={pet.id}
+                  pet={pet}
+                  onEdit={handleEdit}
+                  onDelete={setDeletingPet}
+                  currentUserName={user?.name}
+                  isAdmin={user?.role === "ROLE_ADMIN"}
+                />
+              ))}
+            </div>
+
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center gap-2 pt-4">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={currentPage === 0}
+                  onClick={() => handlePageChange(currentPage - 1)}
+                >
+                  <ChevronLeft className="h-4 w-4 mr-1" /> Anterior
+                </Button>
+                <span className="text-sm text-muted-foreground px-3">
+                  Página <strong className="text-foreground">{currentPage + 1}</strong> de {totalPages}
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={currentPage >= totalPages - 1}
+                  onClick={() => handlePageChange(currentPage + 1)}
+                >
+                  Próxima <ChevronRight className="h-4 w-4 ml-1" />
+                </Button>
+              </div>
+            )}
+          </>
         )}
       </main>
 
