@@ -6,13 +6,23 @@ export interface AuthUser {
   role: string;
 }
 
-function parseJwtRole(token: string): string {
+function parseJwtPayload(token: string): Record<string, unknown> {
   try {
-    const payload = JSON.parse(atob(token.split(".")[1]));
-    return payload.role || "ROLE_USER";
+    return JSON.parse(atob(token.split(".")[1]));
   } catch {
-    return "ROLE_USER";
+    return {};
   }
+}
+
+function parseJwtRole(token: string): string {
+  return (parseJwtPayload(token).role as string) || "ROLE_USER";
+}
+
+export function isTokenExpired(token: string): boolean {
+  const payload = parseJwtPayload(token);
+  const exp = payload.exp as number | undefined;
+  if (!exp) return false;
+  return Date.now() >= exp * 1000;
 }
 
 export interface RegisterData {

@@ -61,6 +61,14 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<ApiR
     ...options,
     headers,
   });
+
+  if (res.status === 401 || res.status === 403) {
+    const { clearAuth } = await import("./auth");
+    clearAuth();
+    window.location.href = "/login";
+    throw new Error("Sessão expirada");
+  }
+
   const json = await res.json();
   if (!res.ok) throw new Error(json.message || "Erro na requisição");
   return json;

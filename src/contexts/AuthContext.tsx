@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback, type ReactNode } from "react";
+import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from "react";
 import {
   type AuthUser,
   type RegisterData,
@@ -8,7 +8,9 @@ import {
   getStoredAuth,
   storeAuth,
   clearAuth,
+  isTokenExpired,
 } from "@/lib/auth";
+import { toast } from "sonner";
 
 interface AuthContextType {
   user: AuthUser | null;
@@ -21,7 +23,31 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<AuthUser | null>(getStoredAuth);
+  const [user, setUser] = useState<AuthUser | null>(() => {
+    const stored = getStoredAuth();
+    if (stored && isTokenExpired(stored.token)) {
+      clearAuth();
+      return null;
+    }
+    return stored;
+  });
+
+  const logout = useCallback(() => {
+    clearAuth();
+    setUser(null);
+  }, []);
+
+  // Verifica expiração token a cada 30s
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const stored = getStoredAuth();
+      if (stored && isTokenExpired(stored.token)) {
+        logout();
+        toast.error("Sessão expirada. Faça login novamente.");
+      }
+    }, 30_000);
+    return () => clearInterval(interval);
+  }, [logout]);
 
   const login = useCallback(async (data: LoginData) => {
     const authUser = await loginUser(data);
@@ -33,11 +59,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const authUser = await registerUser(data);
     storeAuth(authUser);
     setUser(authUser);
-  }, []);
-
-  const logout = useCallback(() => {
-    clearAuth();
-    setUser(null);
   }, []);
 
   return (
