@@ -122,8 +122,8 @@ export function PetForm({ initialData, onSubmit, isPending, submitLabel = "Salva
             id="weight"
             type="number"
             min="0"
-            step="0.1"
-            placeholder="Ex: 5.5"
+            step="1"
+            placeholder="Ex: 5"
             value={form.weight}
             onChange={(e) => handleChange("weight", e.target.value)}
           />
